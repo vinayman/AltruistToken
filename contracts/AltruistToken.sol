@@ -715,8 +715,18 @@ contract AltruistToken is Context, IERC20, Ownable {
     mapping (address => bool) private _isExcluded;
     address[] private _excluded;
     
-    address public _marketingWalletAddress = address(this);
-    address public _charityWalletAddress = address(this);
+    address public _teamWallet = address(0x10Ea5ee9b39be79C57F602e847d42F35947A1Bba);
+    address public _devWallet = address(0xB870c84C8ee9793E45bF2c23cC0d5b59CFA597F5);
+    address public _initialCharityWallet = address(0xcE6c367Cf38153C305BaB9243d3a592540125196);
+    address public _initialMarketingWallet = address(0x6060B235e0BA498A5aF37C8AA1a454c2153d215c);
+    
+    uint256 private _initialTeamFee = 1000;
+    uint256 private _initialDevFee = 300;
+    uint256 private _initialCharityFee = 400;
+    uint256 private _initialMarketingFee = 300;
+    
+    address public _marketingWalletAddress = address(0x6060B235e0BA498A5aF37C8AA1a454c2153d215c);
+    address public _charityWalletAddress = address(0x60f1F0412B509Bd52f91C895ACF58628c4D9e1C8);
    
     uint256 private constant MAX = ~uint256(0);
     uint256 private constant _tTotal = 10000 * 10**6 * 10**9;
@@ -727,19 +737,16 @@ contract AltruistToken is Context, IERC20, Ownable {
     string private _symbol = "ALTR";
     uint8 private _decimals = 9;
     
-    uint256 public _burnFee = 1;
-    uint256 private _previousBurnFee = _burnFee;
-    
-    uint256 public _taxFee = 2;
+    uint256 public _taxFee = 200;
     uint256 private _previousTaxFee = _taxFee;
     
-    uint256 public _marketingFee = 2;
+    uint256 public _marketingFee = 150;
     uint256 private _previousMarketingFee = _marketingFee;
     
-    uint256 public _liquidityFee = 2;
+    uint256 public _liquidityFee = 500;
     uint256 private _previousLiquidityFee = _liquidityFee;
     
-    uint256 public _charityFee = 3;
+    uint256 public _charityFee = 150;
     uint256 private _previousCharityFee = _charityFee;
 
     IUniswapV2Router02 public immutable uniswapV2Router;
@@ -780,7 +787,19 @@ contract AltruistToken is Context, IERC20, Ownable {
         _isExcludedFromFee[owner()] = true;
         _isExcludedFromFee[address(this)] = true;
         
-        emit Transfer(address(0), _msgSender(), _tTotal);
+        uint256 devAmount = calculateInitialDevAmount(_tTotal);
+        uint256 charityAmount = calculateInitialCharityAmount(_tTotal);
+        uint256 teamAmount = calculateInitialTeamAmount(_tTotal);
+        uint256 marketingAmount = calculateInitialMarketingAmount(_tTotal);
+        
+        uint256 remaining_total = _tTotal.sub(devAmount).sub(charityAmount).sub(teamAmount).sub(marketingAmount);
+        
+        emit Transfer(address(0), _charityWalletAddress, charityAmount);
+        emit Transfer(address(0), _marketingWalletAddress, marketingAmount);
+        emit Transfer(address(0), _teamWallet, teamAmount);
+        emit Transfer(address(0), _devWallet, devAmount);
+        
+        emit Transfer(address(0), _msgSender(), remaining_total);
     }
 
     function name() public view returns (string memory) {
@@ -982,67 +1001,51 @@ contract AltruistToken is Context, IERC20, Ownable {
         if(_isExcluded[address(this)])
             _tOwned[address(this)] = _tOwned[address(this)].add(tLiquidity);
     }
-    
-    function _takeCharity(uint256 tCharity) private {
-        uint256 currentRate =  _getRate();
-        uint256 rCharity = tCharity.mul(currentRate);
-        _rOwned[_charityWalletAddress] = _rOwned[_charityWalletAddress].add(rCharity);
-        if(_isExcluded[_charityWalletAddress])
-            _tOwned[_charityWalletAddress] = _tOwned[_charityWalletAddress].add(tCharity);
-    }
-    
-    function _takeMarketing(uint256 tMarketing) private {
-        uint256 currentRate =  _getRate();
-        uint256 rMarketing = tMarketing.mul(currentRate);
-        _rOwned[_marketingWalletAddress] = _rOwned[_marketingWalletAddress].add(rMarketing);
-        if(_isExcluded[_marketingWalletAddress])
-            _tOwned[_marketingWalletAddress] = _tOwned[_marketingWalletAddress].add(tMarketing);
-    }
 
     function calculateTaxFee(uint256 _amount) private view returns (uint256) {
-        return _amount.mul(_taxFee).div(
-            10**2
-        );
+        return _amount.mul(_taxFee).div(10**2).div(10**2);
     }
 
     function calculateLiquidityFee(uint256 _amount) private view returns (uint256) {
-        return _amount.mul(_liquidityFee).div(
-            10**2
-        );
+        return _amount.mul(_liquidityFee).div(10**2).div(10**2);
     }
     
     function calculateCharityFee(uint256 _amount) private view returns (uint256) {
-        return _amount.mul(_charityFee).div(
-            10**2
-        );
+        return _amount.mul(_charityFee).div(10**2).div(10**2);
     }
     
     function calculateMarketingFee(uint256 _amount) private view returns (uint256) {
-        return _amount.mul(_marketingFee).div(
-            10**2
-        );
+        return _amount.mul(_marketingFee).div(10**2).div(10**2);
     }
     
-    function calculateBurnFee(uint256 _amount) private view returns (uint256) {
-        return _amount.mul(_burnFee).div(
-            10**2
-        );
+    function calculateInitialDevAmount(uint256 _amount) private view returns (uint256) {
+        return _amount.mul(_initialDevFee).div(10**2).div(10**2);
+    }
+
+    function calculateInitialCharityAmount(uint256 _amount) private view returns (uint256) {
+        return _amount.mul(_initialCharityFee).div(10**2).div(10**2);
+    }
+    
+    function calculateInitialTeamAmount(uint256 _amount) private view returns (uint256) {
+        return _amount.mul(_initialTeamFee).div(10**2).div(10**2);
+    }
+    
+    function calculateInitialMarketingAmount(uint256 _amount) private view returns (uint256) {
+        return _amount.mul(_initialMarketingFee).div(10**2).div(10**2);
     }
     
     function removeAllFee() private {
-        if(_taxFee == 0 && _liquidityFee == 0 && _marketingFee == 0 && _charityFee == 0 && _burnFee == 0) return;
+        if(_taxFee == 0 && _liquidityFee == 0 && _marketingFee == 0 && _charityFee == 0) return;
         
         _previousTaxFee = _taxFee;
         _previousLiquidityFee = _liquidityFee;
         _previousMarketingFee = _marketingFee;
         _previousCharityFee = _charityFee;
-        _previousBurnFee = _burnFee;
         
         _taxFee = 0;
         _liquidityFee = 0;
         _charityFee = 0;
         _marketingFee = 0;
-        _burnFee = 0;
     }
     
     function restoreAllFee() private {
@@ -1050,7 +1053,6 @@ contract AltruistToken is Context, IERC20, Ownable {
         _liquidityFee = _previousLiquidityFee;
         _marketingFee = _previousMarketingFee;
         _charityFee = _previousCharityFee;
-        _burnFee = _previousBurnFee;
     }
     
     function isExcludedFromFee(address account) public view returns(bool) {
@@ -1107,7 +1109,7 @@ contract AltruistToken is Context, IERC20, Ownable {
             takeFee = false;
         }
         
-        //transfer amount, it will take tax, burn, liquidity fee
+        //transfer amount, it will take tax, liquidity fee
         _tokenTransfer(from,to,amount,takeFee);
     }
 
@@ -1172,24 +1174,23 @@ contract AltruistToken is Context, IERC20, Ownable {
         if(!takeFee)
             removeAllFee();
             
-        //Calculate burn amount, marketing amount and charity amount
-        uint256 burnAmt = calculateBurnFee(amount);
+        //Calculate marketing amount and charity amount
         uint256 charityAmt = calculateCharityFee(amount);
         uint256 marketingAmt = calculateMarketingFee(amount);
 
         if (_isExcluded[sender] && !_isExcluded[recipient]) {
-            _transferFromExcluded(sender, recipient, amount.sub(charityAmt).sub(marketingAmt).sub(burnAmt));
+            _transferFromExcluded(sender, recipient, amount.sub(charityAmt).sub(marketingAmt));
         } else if (!_isExcluded[sender] && _isExcluded[recipient]) {
-            _transferToExcluded(sender, recipient, amount.sub(charityAmt).sub(marketingAmt).sub(burnAmt));
+            _transferToExcluded(sender, recipient, amount.sub(charityAmt).sub(marketingAmt));
         } else if (!_isExcluded[sender] && !_isExcluded[recipient]) {
-            _transferStandard(sender, recipient, amount.sub(charityAmt).sub(marketingAmt).sub(burnAmt));
+            _transferStandard(sender, recipient, amount.sub(charityAmt).sub(marketingAmt));
         } else if (_isExcluded[sender] && _isExcluded[recipient]) {
-            _transferBothExcluded(sender, recipient, amount.sub(charityAmt).sub(marketingAmt).sub(burnAmt));
+            _transferBothExcluded(sender, recipient, amount.sub(charityAmt).sub(marketingAmt));
         } else {
-            _transferStandard(sender, recipient, amount.sub(charityAmt).sub(marketingAmt).sub(burnAmt));
+            _transferStandard(sender, recipient, amount.sub(charityAmt).sub(marketingAmt));
         }
 
-        //Temporarily remove fees to transfer to burn address and marketing wallet
+        //Temporarily remove fees to transfer to charity address and marketing wallet
         _taxFee = 0;
         _liquidityFee = 0;
 

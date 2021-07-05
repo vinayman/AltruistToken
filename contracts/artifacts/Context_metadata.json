@@ -1,0 +1,45 @@
+{
+	"compiler": {
+		"version": "0.6.12+commit.27d51765"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/AltruistToken.sol": "Context"
+		},
+		"evmVersion": "istanbul",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/AltruistToken.sol": {
+			"keccak256": "0xaee9dd72dd302b5efc412864894bf3ecd35c52c63cec702fe0cccdb1bacd5799",
+			"license": "Unlicensed",
+			"urls": [
+				"bzz-raw://cfd4948f4d1d5d4cb40f867f21426ff61b5c4105563332688e6a831e07214b73",
+				"dweb:/ipfs/QmR2kXxkrE12eacLNatryJmEBJobAKJouijedKCBFv8SvG"
+			]
+		}
+	},
+	"version": 1
+}
