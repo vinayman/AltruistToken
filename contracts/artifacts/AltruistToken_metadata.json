@@ -867,11 +867,11 @@
 	},
 	"sources": {
 		"contracts/AltruistToken.sol": {
-			"keccak256": "0x9138418143acfbfd61f45196941af0c75781a9eb4c4400740b2748867f55144f",
+			"keccak256": "0x3587ca2b3204dc331fd5a6db59b8781e54a8c0250aaaa9555427b6d4a8905378",
 			"license": "Unlicensed",
 			"urls": [
-				"bzz-raw://7c7a84e8b75119ece169cc6743757e6f1596e1ac62c211204dc2faf32d1c9424",
-				"dweb:/ipfs/QmTKf17Afyqsh5JQbLodDtXMG5qM9bcPmm47m8a5xBe9Ts"
+				"bzz-raw://86a8fc105d250c8d2d22f799002d75356038d0407a3958d46ff3bd5bfc1c7c78",
+				"dweb:/ipfs/QmV7R47L9C2Mz3bfUoUXGX3LEEPW94rkHYacYxm7nNLW22"
 			]
 		}
 	},
