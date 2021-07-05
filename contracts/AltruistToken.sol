@@ -24,7 +24,7 @@ d8'          `8b  88888888888  88       88      `8b   `"Y8888Y"'   88   "Y88888P
 
 pragma solidity ^0.6.12;
 // SPDX-License-Identifier: Unlicensed
-interface IERC20 {
+interface IBEP20 {
 
     function totalSupply() external view returns (uint256);
 
@@ -92,8 +92,6 @@ interface IERC20 {
      */
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
-
-
 
 /**
  * @dev Wrappers over Solidity's arithmetic operations with added overflow
@@ -660,7 +658,7 @@ interface IPancakeRouter02 is IPancakeRouter01 {
     ) external;
 }
 
-contract AltruistToken is Context, IERC20, Ownable {
+contract AltruistToken is Context, IBEP20, Ownable {
     using SafeMath for uint256;
     using Address for address;
 
