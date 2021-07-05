@@ -182,7 +182,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/AltruistToken.sol": "IUniswapV2Factory"
+			"contracts/AltruistToken.sol": "IPancakeFactory"
 		},
 		"evmVersion": "istanbul",
 		"libraries": {},

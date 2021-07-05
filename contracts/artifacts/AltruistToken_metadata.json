@@ -557,6 +557,32 @@
 				"type": "function"
 			},
 			{
+				"inputs": [],
+				"name": "pancakePair",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "pancakeRouter",
+				"outputs": [
+					{
+						"internalType": "contract IPancakeRouter02",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "uint256",
@@ -778,32 +804,6 @@
 			},
 			{
 				"inputs": [],
-				"name": "uniswapV2Pair",
-				"outputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "uniswapV2Router",
-				"outputs": [
-					{
-						"internalType": "contract IUniswapV2Router02",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
 				"name": "unlock",
 				"outputs": [],
 				"stateMutability": "nonpayable",
@@ -867,11 +867,11 @@
 	},
 	"sources": {
 		"contracts/AltruistToken.sol": {
-			"keccak256": "0xaee9dd72dd302b5efc412864894bf3ecd35c52c63cec702fe0cccdb1bacd5799",
+			"keccak256": "0x8c55639e06d272e4de66881ff2875e0aa98484f7fcd7ec3b7db87c69f4a714f1",
 			"license": "Unlicensed",
 			"urls": [
-				"bzz-raw://cfd4948f4d1d5d4cb40f867f21426ff61b5c4105563332688e6a831e07214b73",
-				"dweb:/ipfs/QmR2kXxkrE12eacLNatryJmEBJobAKJouijedKCBFv8SvG"
+				"bzz-raw://79b81d290c8c6bc95cd33f08b57ad4aafcc2717e87223d6bba82cc4ef8cd5343",
+				"dweb:/ipfs/QmRnAU8uv9TZhRu63BL12gtvjjvua3jyYV1AqkziegagQt"
 			]
 		}
 	},
