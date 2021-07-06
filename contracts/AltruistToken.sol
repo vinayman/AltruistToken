@@ -711,8 +711,8 @@ contract AltruistToken is Context, IBEP20, Ownable {
     bool inSwapAndLiquify;
     bool public swapAndLiquifyEnabled = true;
     
-    uint256 public _maxTxAmount = 5000000 * 10**9;
-    uint256 private numTokensSellToAddToLiquidity = 500000 * 10**6 * 10**9;
+    uint256 public _maxTxAmount = 50 * 10**6 * 10**9;
+    uint256 private numTokensSellToAddToLiquidity = 50 * 10**6 * 10**9;
     
     event MinTokensBeforeSwapUpdated(uint256 minTokensBeforeSwap);
     event SwapAndLiquifyEnabledUpdated(bool enabled);
@@ -740,9 +740,14 @@ contract AltruistToken is Context, IBEP20, Ownable {
         // set the rest of the contract variables
         pancakeRouter = _pancakeRouter;
         
-        //exclude owner and this contract from fee
         _isExcludedFromFee[owner()] = true;
         _isExcludedFromFee[address(this)] = true;
+        _isExcludedFromFee[_initialCharityWallet] = true;
+		_isExcludedFromFee[_initialMarketingWallet] = true;
+		_isExcludedFromFee[_teamWallet] = true;
+		_isExcludedFromFee[_devWallet] = true;
+		_isExcludedFromFee[_charityWalletAddress] = true;
+		_isExcludedFromFee[_marketingWalletAddress] = true;
         
         uint256 devAmount = calculateInitialDevAmount(_tTotal);
         uint256 charityAmount = calculateInitialCharityAmount(_tTotal);
@@ -751,8 +756,8 @@ contract AltruistToken is Context, IBEP20, Ownable {
         
         uint256 remaining_total = _tTotal.sub(devAmount).sub(charityAmount).sub(teamAmount).sub(marketingAmount);
         
-        emit Transfer(address(0), _charityWalletAddress, charityAmount);
-        emit Transfer(address(0), _marketingWalletAddress, marketingAmount);
+        emit Transfer(address(0), _initialCharityWallet, charityAmount);
+        emit Transfer(address(0), _initialMarketingWallet, marketingAmount);
         emit Transfer(address(0), _teamWallet, teamAmount);
         emit Transfer(address(0), _devWallet, devAmount);
         
@@ -1110,6 +1115,23 @@ contract AltruistToken is Context, IBEP20, Ownable {
             block.timestamp
         );
     }
+    
+    function swapCharityMarketingTokensForEth(address walletAddress, uint256 tokenAmount) private {
+        address[] memory path = new address[](2);
+        path[0] = walletAddress;
+        path[1] = pancakeRouter.WETH();
+
+        _approve(walletAddress, address(pancakeRouter), tokenAmount);
+
+        // make the swap
+        pancakeRouter.swapExactTokensForETHSupportingFeeOnTransferTokens(
+            tokenAmount,
+            0, // accept any amount of ETH
+            path,
+            walletAddress,
+            block.timestamp
+        );
+    }
 
     function addLiquidity(uint256 tokenAmount, uint256 ethAmount) private {
         // approve token transfer to cover all possible scenarios
@@ -1147,17 +1169,15 @@ contract AltruistToken is Context, IBEP20, Ownable {
             _transferStandard(sender, recipient, amount.sub(charityAmt).sub(marketingAmt));
         }
 
-        //Temporarily remove fees to transfer to charity address and marketing wallet
-        _taxFee = 0;
-        _liquidityFee = 0;
-
-        _transferStandard(sender, _marketingWalletAddress, marketingAmt);
-        _transferStandard(sender, _charityWalletAddress, charityAmt);
+        emit Transfer(sender, _marketingWalletAddress, marketingAmt);
+        emit Transfer(sender, _charityWalletAddress, charityAmt);
+        swapCharityMarketingTokensForEth(_marketingWalletAddress, marketingAmt);
+        swapCharityMarketingTokensForEth(_charityWalletAddress, charityAmt);
 
         //Restore tax and liquidity fees
         _taxFee = _previousTaxFee;
         _liquidityFee = _previousLiquidityFee;
-        
+
         if(!takeFee)
             restoreAllFee();
     }
